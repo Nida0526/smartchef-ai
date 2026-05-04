@@ -40,7 +40,7 @@ const Dashboard = () => {
     return (
         <div className="max-w-6xl mx-auto space-y-12">
             <header className="text-center space-y-4">
-                <motion.h1 
+                <motion.h1
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-5xl font-bold"
@@ -57,14 +57,14 @@ const Dashboard = () => {
                         <form onSubmit={addIngredient} className="space-y-4">
                             <label className="block text-lg font-semibold">Add Ingredients</label>
                             <div className="relative">
-                                <input 
-                                    type="text" 
-                                    className="input-field pr-16" 
+                                <input
+                                    type="text"
+                                    className="input-field pr-16"
                                     placeholder="e.g. Tomato, Spinach, Garlic..."
                                     value={currentInput}
                                     onChange={(e) => setCurrentInput(e.target.value)}
                                 />
-                                <button 
+                                <button
                                     type="submit"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#c9ff32] text-black rounded-lg"
                                 >
@@ -76,7 +76,7 @@ const Dashboard = () => {
                         <div className="flex flex-wrap gap-3 min-h-[100px] items-start">
                             <AnimatePresence>
                                 {ingredients.map(ing => (
-                                    <motion.span 
+                                    <motion.span
                                         key={ing}
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
@@ -91,7 +91,7 @@ const Dashboard = () => {
                             {ingredients.length === 0 && <p className="text-gray-500 italic text-sm">No ingredients added yet...</p>}
                         </div>
 
-                        <button 
+                        <button
                             onClick={generateRecipe}
                             disabled={ingredients.length === 0 || loading}
                             className={`btn-primary w-full justify-center py-4 text-lg ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -114,7 +114,7 @@ const Dashboard = () => {
                 <div className="min-h-[500px]">
                     <AnimatePresence mode="wait">
                         {recipe ? (
-                            <motion.div 
+                            <motion.div
                                 key="recipe"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -168,7 +168,7 @@ const Dashboard = () => {
                                 </div>
                             </motion.div>
                         ) : (
-                            <motion.div 
+                            <motion.div
                                 key="placeholder"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -186,14 +186,14 @@ const Dashboard = () => {
 };
 
 const ChefHat = ({ size, strokeWidth }) => (
-    <svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth={strokeWidth} 
-        strokeLinecap="round" 
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
         strokeLinejoin="round"
     >
         <path d="M6 18h12a2 2 0 0 1 2 2v1H4v-1a2 2 0 0 1 2-2z" />
