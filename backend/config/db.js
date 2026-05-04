@@ -12,6 +12,7 @@ const connectDB = async () => {
         console.log('=> using new database connection');
         const db = await mongoose.connect(process.env.MONGO_URI, {
             serverSelectionTimeoutMS: 5000,
+            bufferCommands: false
         });
         isConnected = db.connections[0].readyState;
         console.log(`MongoDB Connected: ${db.connection.host}`);

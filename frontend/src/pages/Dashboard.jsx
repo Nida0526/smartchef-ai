@@ -30,7 +30,8 @@ const Dashboard = () => {
             const { data } = await API.post('/recipes/generate', { ingredients });
             setRecipe(data);
         } catch (err) {
-            setError('The AI Agent is busy. Please try again.');
+            const msg = err.response?.data?.message || err.response?.data?.error || 'The AI Agent is busy. Please try again.';
+            setError(msg);
         } finally {
             setLoading(false);
         }

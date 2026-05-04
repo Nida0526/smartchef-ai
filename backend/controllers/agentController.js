@@ -1,9 +1,7 @@
 const openai = require('../utils/openaiClient');
-
-// In-memory stores (works without MongoDB)
-const chatHistory = new Map(); // userId -> [{role, content}]
-const recipeHistory = new Map(); // userId -> [{recipe, ingredients, timestamp}]
-const preferences = new Map(); // userId -> {diet, allergies, ...}
+const Recipe = require('../models/Recipe');
+const ChatHistory = require('../models/ChatHistory');
+const User = require('../models/User');
 
 /**
  * @desc    Generate Personalized Recipe (The Agentic Brain)
@@ -19,17 +17,19 @@ const generateRecipe = async (req, res) => {
     }
 
     try {
-        // 1. Context Retrieval (User Preferences) - from memory
-        const userPrefs = preferences.get(userId) || {
+        // 1. Context Retrieval (User Preferences)
+        const user = await User.findById(userId).populate('preferences');
+        const userPrefs = user?.preferences || {
             diet: 'None',
             allergies: [],
             calorieGoals: 2000,
             dislikedIngredients: []
         };
 
-        // 2. Long-Term Memory (Recent Chat History) - from memory
-        const history = chatHistory.get(userId) || [];
-        const recentHistory = history.slice(-5);
+        // 2. Long-Term Memory (Recent Chat History)
+        const recentHistory = await ChatHistory.find({ userId })
+            .sort({ createdAt: -1 })
+            .limit(5);
 
         // 3. Reasoning & Prompt Construction
         const systemPrompt = `
@@ -57,7 +57,7 @@ INSTRUCTIONS:
 `;
 
         // 4. Action (AI API Call)
-        console.log(`🧠 Agent reasoning for user ${userId} with ingredients: ${ingredients.join(', ')}`);
+        console.log(`🧠 Agent reasoning for user ${userId}`);
 
         const isGroq = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('gsk_');
         const response = await openai.chat.completions.create({
@@ -69,26 +69,42 @@ INSTRUCTIONS:
             response_format: { type: 'json_object' }
         });
 
-        const recipeData = JSON.parse(response.choices[0].message.content);
-        console.log(`✅ Recipe generated: ${recipeData.title}`);
+        let recipeData;
+        try {
+            recipeData = JSON.parse(response.choices[0].message.content);
+        } catch (parseError) {
+            console.error('JSON Parse Error, attempting to extract JSON block');
+            const content = response.choices[0].message.content;
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                recipeData = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error('AI returned invalid format');
+            }
+        }
 
-        // 5. Update Memory (Save to in-memory history)
-        if (!chatHistory.has(userId)) chatHistory.set(userId, []);
-        chatHistory.get(userId).push(
-            { role: 'user', content: `Requested recipe for: ${ingredients.join(', ')}` },
-            { role: 'assistant', content: `Suggested: ${recipeData.title}` }
-        );
-
-        // 6. Save to Recipe History
-        if (!recipeHistory.has(userId)) recipeHistory.set(userId, []);
-        recipeHistory.get(userId).push({
-            id: Date.now().toString(),
-            recipe: recipeData,
-            ingredients: ingredients,
-            timestamp: new Date().toISOString()
+        // 5. Save to Database (Chat History)
+        await ChatHistory.create({
+            userId,
+            role: 'user',
+            content: `Requested recipe for: ${ingredients.join(', ')}`,
+            metadata: { ingredients }
         });
 
-        res.status(200).json(recipeData);
+        await ChatHistory.create({
+            userId,
+            role: 'assistant',
+            content: `Suggested: ${recipeData.title}`,
+            metadata: { recipeGenerated: true }
+        });
+
+        // 6. Save to Recipe History
+        const savedRecipe = await Recipe.create({
+            userId,
+            ...recipeData
+        });
+
+        res.status(200).json(savedRecipe);
 
     } catch (error) {
         console.error('Agent Logic Error:', error.message);
@@ -102,10 +118,12 @@ INSTRUCTIONS:
  * @access  Private
  */
 const getHistory = async (req, res) => {
-    const userId = req.user._id;
-    const history = recipeHistory.get(userId) || [];
-    // Return newest first
-    res.status(200).json(history.slice().reverse());
+    try {
+        const history = await Recipe.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch history' });
+    }
 };
 
 /**
@@ -114,12 +132,12 @@ const getHistory = async (req, res) => {
  * @access  Private
  */
 const deleteHistory = async (req, res) => {
-    const userId = req.user._id;
-    const { id } = req.params;
-    const history = recipeHistory.get(userId) || [];
-    const filtered = history.filter(item => item.id !== id);
-    recipeHistory.set(userId, filtered);
-    res.status(200).json({ message: 'Recipe removed from history' });
+    try {
+        await Recipe.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+        res.status(200).json({ message: 'Recipe removed from history' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to delete recipe' });
+    }
 };
 
 module.exports = { generateRecipe, getHistory, deleteHistory };
