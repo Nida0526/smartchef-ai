@@ -4,17 +4,23 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const recipeRoutes = require('./routes/recipeRoutes');
 const authRoutes = require('./routes/authRoutes');
-
 dotenv.config();
-
-// Connect to MongoDB
-connectDB();
 
 const app = express();
 
 // CORS
 app.use(cors());
 app.use(express.json());
+
+// Connect to MongoDB middleware
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Database connection failed', error: error.message });
+    }
+});
 
 // Request logger
 app.use((req, res, next) => {
