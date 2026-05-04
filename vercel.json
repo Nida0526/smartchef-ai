@@ -1,11 +1,9 @@
 {
-  "buildCommand": "npm run build --prefix frontend && cp -r frontend/dist dist",
-  "outputDirectory": "dist",
+  "buildCommand": "npm run build --prefix frontend && rm -rf public && cp -r frontend/dist public",
+  "outputDirectory": "public",
   "installCommand": "npm install --prefix frontend",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }
