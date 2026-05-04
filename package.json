@@ -1,8 +1,0 @@
-{
-  "name": "smartchef-deploy",
-  "version": "1.0.0",
-  "scripts": {
-    "install": "cd frontend && npm install",
-    "build": "cd frontend && npm run build && cd .. && cp -r frontend/dist dist"
-  }
-}
