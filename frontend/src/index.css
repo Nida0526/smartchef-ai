@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #050b18;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --primary: #c9ff32;
+  --secondary: #6366f1;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --glass-blur: 12px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  @apply min-h-screen overflow-x-hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Outfit', sans-serif;
+}
+
+@layer components {
+  .glass {
+    @apply bg-[rgba(255,255,255,0.03)] backdrop-blur-[12px] border border-[rgba(255,255,255,0.1)] rounded-[24px];
+  }
+
+  .btn-primary {
+    @apply bg-[#c9ff32] text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02] hover:brightness-110 active:scale-95;
+  }
+
+  .input-field {
+    @apply bg-white/5 border border-white/10 text-white px-5 py-3.5 rounded-xl w-full outline-none focus:border-[#c9ff32] transition-colors;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 10px;
+}
