@@ -1,14 +1,18 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const connectDB = require('./config/db');
 const recipeRoutes = require('./routes/recipeRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
+// Connect to MongoDB
+connectDB();
+
 const app = express();
 
-// CORS - allow everything in development
+// CORS
 app.use(cors());
 app.use(express.json());
 
@@ -25,8 +29,13 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Export for Vercel
+module.exports = app;
 
-app.listen(PORT, () => {
-    console.log(`✅ SmartChef Backend running on http://localhost:${PORT}`);
-});
+// Only listen if not running as a serverless function
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => {
+        console.log(`✅ SmartChef Backend running on http://localhost:${PORT}`);
+    });
+}
