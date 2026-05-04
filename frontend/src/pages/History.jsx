@@ -27,7 +27,7 @@ const History = () => {
     const deleteItem = async (id) => {
         try {
             await API.delete(`/recipes/history/${id}`);
-            setHistory(history.filter(item => item.id !== id));
+            setHistory(history.filter(item => (item._id || item.id) !== id));
         } catch (err) {
             console.error('Failed to delete:', err);
         }
@@ -38,6 +38,7 @@ const History = () => {
     };
 
     const formatDate = (timestamp) => {
+        if (!timestamp) return 'Just now';
         const date = new Date(timestamp);
         return date.toLocaleDateString('en-US', {
             month: 'short',
@@ -94,106 +95,109 @@ const History = () => {
             ) : (
                 <div className="space-y-4">
                     <AnimatePresence>
-                        {history.map((item, index) => (
-                            <motion.div
-                                key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, x: -100 }}
-                                transition={{ delay: index * 0.05 }}
-                                className="glass overflow-hidden"
-                            >
-                                {/* Card Header - always visible */}
-                                <div
-                                    className="flex items-center justify-between p-6 cursor-pointer hover:bg-white/[0.02] transition-colors"
-                                    onClick={() => toggleExpand(item.id)}
+                        {history.map((item, index) => {
+                            const itemId = item._id || item.id;
+                            return (
+                                <motion.div
+                                    key={itemId}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -100 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="glass overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-12 h-12 rounded-xl bg-[#c9ff32]/10 flex items-center justify-center">
-                                            <Utensils size={22} className="text-[#c9ff32]" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold">{item.recipe.title}</h3>
-                                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
-                                                <span className="flex items-center gap-1">
-                                                    <Clock size={14} />
-                                                    {formatDate(item.timestamp)}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Flame size={14} className="text-orange-400" />
-                                                    {item.recipe.calories} kcal
-                                                </span>
+                                    {/* Card Header - always visible */}
+                                    <div
+                                        className="flex items-center justify-between p-6 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                                        onClick={() => toggleExpand(itemId)}
+                                    >
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-12 h-12 rounded-xl bg-[#c9ff32]/10 flex items-center justify-center">
+                                                <Utensils size={22} className="text-[#c9ff32]" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold">{item.title}</h3>
+                                                <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
+                                                    <span className="flex items-center gap-1">
+                                                        <Clock size={14} />
+                                                        {formatDate(item.createdAt || item.timestamp)}
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <Flame size={14} className="text-orange-400" />
+                                                        {item.calories} kcal
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex gap-2">
-                                            {item.ingredients.slice(0, 3).map((ing, i) => (
-                                                <span key={i} className="text-xs bg-white/5 px-3 py-1 rounded-full text-gray-300 border border-white/5">
-                                                    {ing}
-                                                </span>
-                                            ))}
-                                            {item.ingredients.length > 3 && (
-                                                <span className="text-xs bg-white/5 px-3 py-1 rounded-full text-gray-500">
-                                                    +{item.ingredients.length - 3}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); deleteItem(item.id); }}
-                                            className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
-                                            title="Delete recipe"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Expanded Content */}
-                                <AnimatePresence>
-                                    {expandedId === item.id && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="overflow-hidden"
-                                        >
-                                            <div className="px-6 pb-6 pt-2 border-t border-white/5 space-y-5">
-                                                {item.recipe.description && (
-                                                    <p className="text-gray-400 text-sm italic">{item.recipe.description}</p>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex gap-2">
+                                                {(item.ingredients || []).slice(0, 3).map((ing, i) => (
+                                                    <span key={i} className="text-xs bg-white/5 px-3 py-1 rounded-full text-gray-300 border border-white/5">
+                                                        {ing}
+                                                    </span>
+                                                ))}
+                                                {(item.ingredients || []).length > 3 && (
+                                                    <span className="text-xs bg-white/5 px-3 py-1 rounded-full text-gray-500">
+                                                        +{(item.ingredients || []).length - 3}
+                                                    </span>
                                                 )}
-
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-[#c9ff32] uppercase tracking-wider mb-3">Ingredients</h4>
-                                                    <ul className="grid grid-cols-2 gap-2">
-                                                        {item.recipe.ingredients.map((ing, i) => (
-                                                            <li key={i} className="text-gray-300 text-sm flex items-center gap-2">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9ff32]" />
-                                                                {ing}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-[#c9ff32] uppercase tracking-wider mb-3">Instructions</h4>
-                                                    <ol className="space-y-3">
-                                                        {item.recipe.instructions.map((step, i) => (
-                                                            <li key={i} className="flex gap-3">
-                                                                <span className="text-[#c9ff32] font-bold text-sm min-w-[24px]">0{i + 1}</span>
-                                                                <p className="text-gray-300 text-sm leading-relaxed">{step}</p>
-                                                            </li>
-                                                        ))}
-                                                    </ol>
-                                                </div>
                                             </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.div>
-                        ))}
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); deleteItem(itemId); }}
+                                                className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                                title="Delete recipe"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Expanded Content */}
+                                    <AnimatePresence>
+                                        {expandedId === itemId && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="px-6 pb-6 pt-2 border-t border-white/5 space-y-5">
+                                                    {item.description && (
+                                                        <p className="text-gray-400 text-sm italic">{item.description}</p>
+                                                    )}
+
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-[#c9ff32] uppercase tracking-wider mb-3">Ingredients</h4>
+                                                        <ul className="grid grid-cols-2 gap-2">
+                                                            {(item.ingredients || []).map((ing, i) => (
+                                                                <li key={i} className="text-gray-300 text-sm flex items-center gap-2">
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#c9ff32]" />
+                                                                    {ing}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-[#c9ff32] uppercase tracking-wider mb-3">Instructions</h4>
+                                                        <ol className="space-y-3">
+                                                            {(item.instructions || []).map((step, i) => (
+                                                                <li key={i} className="flex gap-3">
+                                                                    <span className="text-[#c9ff32] font-bold text-sm min-w-[24px]">0{i + 1}</span>
+                                                                    <p className="text-gray-300 text-sm leading-relaxed">{step}</p>
+                                                                </li>
+                                                            ))}
+                                                        </ol>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
                 </div>
             )}
