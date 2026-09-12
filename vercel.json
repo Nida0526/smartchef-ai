@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "installCommand": "npm install && npm install --prefix backend && npm install --prefix frontend && node backend/download-mongod.js",
+  "buildCommand": "npm run build --prefix frontend && node backend/download-mongod.js",
+  "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "frontend/dist/**",
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/server" }
+  ]
+}
