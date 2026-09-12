@@ -1,72 +1,145 @@
-# SmartChef AI
+<div align="center">
 
-Your kitchen's smartest sous-chef. An AI-powered recipe web app with conversation, fridge vision, and voice-guided cooking.
+# 🍳 SmartChef AI
 
-## GitHub
+**Your kitchen's smartest sous-chef.**
 
-**https://github.com/Nida0526/smartchef-ai**
+An AI-powered recipe web application featuring conversational recipe finder, fridge & pantry vision, full recipe generation, and hands-free voice-guided cooking.
 
-## Live Demo
+[![GitHub](https://img.shields.io/badge/GitHub-SmartChef%20AI-8f1c2e?style=flat-square&logo=github)](https://github.com/Nida0526/smartchef-ai)
+[![License](https://img.shields.io/badge/license-ISC-blue?style=flat-square)](LICENSE)
+![Tech](https://img.shields.io/badge/stack-React%2019%20%2B%20Express%205-8f1c2e?style=flat-square)
 
-**https://carrier-fitted-particle-jar.trycloudflare.com**
+</div>
 
-> The demo runs from a temporary Cloudflare tunnel to a local server. Log in with:
+---
 
-| Name        | Email                | Password       |
-|-------------|----------------------|----------------|
-| Demo Chef   | `demo@smartchef.ai`  | `smartchef123` |
-| Guest User  | `guest@smartchef.ai` | `guest1234`    |
+## ✨ Features
 
-These demo accounts are seeded automatically on every backend start (see `backend/seedDemoUser.js` and `DEMO_ACCOUNTS.md`).
+| Feature | Description |
+|---|---|
+| 💬 **AI Recipe Chat** | Conversational meal ideas with long-term memory — diet type, allergies, cuisine preferences, and calorie goals (plus recent conversation context) |
+| 📷 **Fridge Vision** | Photograph your fridge or pantry; AI identifies the ingredients and suggests recipes you can make right now |
+| 📝 **Recipe Generator** | Generates complete recipes — title, macro breakdown, ingredients, and step-by-step instructions — from whatever you have on hand |
+| 🎧 **Cook Mode** | Hands-free, step-by-step cooking with voice guidance: smart timers parsed from recipe text, beep + text-to-speech "Time's up", and keyboard shortcuts |
+| 🎙️ **Voice Input** | Speak your request instead of typing |
+| ⚡ **Quick-Start Chips** | One-tap recipe ideas to get cooking instantly |
+| 🔖 **Saved Recipes** | Bookmark and manage your favorites |
+| 🔐 **Auth** | JWT-based authentication with bcrypt-hashed passwords |
 
-## Features
+## 🧱 Tech Stack
 
-- **AI Recipe Chat** — chat with Gemini for meal ideas, with long-term memory (diet type, allergies, cuisines, calorie goals) and recent chat context
-- **Fridge Vision** — snap a photo of your fridge/pantry and AI detects ingredients and suggests recipes
-- **Recipe Generator** — generate complete recipes (title, macros, ingredients, instructions) from whatever you have
-- **Cook Mode** — hands-free step-by-step cooking with voice guidance, smart timers parsed from recipe text, beeps + text-to-speech "Time's up", and keyboard controls
-- **Voice Input** — speak your request instead of typing
-- **Quick-Start Chips** — one-tap recipe ideas to get cooking instantly
-- **Saved Recipes** — bookmark and organize your favorites
-- **Auth** — register/login with JWT, bcrypt-hashed passwords
+- **Frontend:** React 19, Vite 8, React Router 7, lucide-react — white & maroon kitchen-themed UI
+- **Backend:** Node.js, Express 5, Mongoose, MongoDB
+- **AI:** Google Gemini `gemini-3.6-flash` (primary), OpenAI (configurable fallback), built-in Demo Mode fallback so the UI never breaks
 
-## Tech Stack
+## 🚀 Getting Started
 
-- **Frontend:** React 19 + Vite, React Router, lucide-react (white & maroon kitchen-themed UI)
-- **Backend:** Node.js + Express 5, Mongoose, MongoDB (in-memory by default, swap via `MONGODB_URI`)
-- **AI:** Google Gemini (`gemini-3.6-flash`) with OpenAI fallback; graceful demo-mode fallback if no key is configured
+### Prerequisites
 
-## Getting Started
+- **Node.js 18+**
+- A Google Gemini API key (or OpenAI key) — add it to `backend/.env`
+
+### Installation
 
 ```bash
-# install dependencies (root, backend, frontend)
-npm install && npm run install:all
+# 1. Clone the repository
+git clone https://github.com/Nida0526/smartchef-ai.git
+cd smartchef-ai
 
-# create the backend env file
+# 2. Install dependencies for root, backend, and frontend
+npm install
+npm run install:all
+
+# 3. Configure environment variables
 cp backend/.env.example backend/.env
-# add your GEMINI_API_KEY to backend/.env
+# then edit backend/.env and set your GEMINI_API_KEY
+```
 
-# run in development (backend :5001 + frontend :5173)
-npm run dev
+### Running in development
 
-# build + run in production (single server serves the frontend + API)
-npm run build
-npm start   # NODE_ENV=production node backend/server.js
+```bash
+npm run dev            # backend → http://localhost:5001  ·  frontend → http://localhost:5173
+```
+
+The Vite dev server proxies `/api` requests to the backend automatically.
+
+### Production build
+
+```bash
+npm run build          # builds the frontend into frontend/dist
+npm start              # NODE_ENV=production → single Express server serves UI + API
 ```
 
 The production server serves the built frontend at `/` and the API under `/api` (health check: `GET /api/health`).
 
-## Project Structure
+## 🔑 Demo Accounts
+
+Two accounts are **seeded automatically on every backend start** — so they always work, even though the default database is in-memory.
+
+| Name | Email | Password |
+|---|---|---|
+| Demo Chef | `demo@smartchef.ai` | `smartchef123` |
+| Guest User | `guest@smartchef.ai` | `guest1234` |
+
+Configured in [`backend/seedDemoUser.js`](backend/seedDemoUser.js).
+
+## 🗂️ Project Structure
 
 ```
-backend/            Express server: auth routes, AI controller, models, seed script
-frontend/src        React app: pages, components (CookMode, KitchenArt, AuthHero), API client
-frontend/public     favicon + icons
-DEMO_ACCOUNTS.md    Seeded demo login credentials
+smartchef-ai/
+├── backend/                  # Express API
+│   ├── controllers/          # auth + AI logic (chat, vision, recipes, stream)
+│   ├── models/               # Mongoose models (User, SavedRecipe, ChatHistory, Preference)
+│   ├── routes/               # API route definitions
+│   ├── seedDemoUser.js       # seeds demo login accounts on boot
+│   └── server.js             # Express app (serves frontend dist in production)
+├── frontend/                 # React app
+│   ├── public/               # favicon + icons
+│   └── src/
+│       ├── components/       # Navbar, CookMode, KitchenArt, AuthHero, …
+│       ├── pages/            # Dashboard, Generator, SavedRecipes, Login, Register
+│       └── lib/              # API client (axios + streaming)
+├── README.md
+└── DEMO_ACCOUNTS.md
 ```
 
-**Note:** the default database is in-memory (`MongoMemoryServer`), so self-registered accounts and saved data reset on restart — seeded demo accounts are always re-created. Set `MONGODB_URI` to a persistent database (e.g., MongoDB Atlas) for a permanent deployment.
+## 🌐 API Overview
 
-## License
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/auth/register` | Create an account |
+| `POST` | `/api/auth/login` | Log in (returns JWT) |
+| `POST` | `/api/ai/chat` | Ask for a recipe (single response) |
+| `POST` | `/api/ai/chat/stream` | Ask for a recipe (SSE token stream) |
+| `GET` | `/api/ai/chat/history` | Chat history |
+| `POST` | `/api/ai/vision` | Detect ingredients from a fridge/pantry photo |
+| `POST` | `/api/ai/generate-recipe` | Generate a full recipe |
+| `GET/POST` | `/api/ai/preferences` | Read / update user preferences |
+| `GET/POST/DELETE` | `/api/ai/saved` | Manage saved recipes |
+| `GET` | `/api/health` | Health check |
 
-ISC
+## ⚙️ Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `PORT` | Backend port | `5000` |
+| `MONGODB_URI` | MongoDB connection string | in-memory (`mock_local`) |
+| `JWT_SECRET` | Secret used to sign auth tokens | — |
+| `GEMINI_API_KEY` | Google Gemini API key | — |
+| `GEMINI_MODEL` | Gemini model name | `gemini-3.6-flash` |
+| `OPENAI_API_KEY` | Optional OpenAI fallback | `mock_key` |
+
+## 🚢 Deployment
+
+The default database is **in-memory** (`MongoMemoryServer`), so registered accounts and saved data reset on restart — the two demo accounts are always recreated.
+
+For a **permanent deployment**:
+
+1. Create a free MongoDB Atlas cluster and set `MONGODB_URI` (recommended)
+2. Deploy `backend/` + built `frontend/dist` to any Node host (Render, Railway, Fly.io, Vercel)
+3. Set `NODE_ENV=production` and `PORT` for the platform
+
+## 📄 License
+
+Released under the [ISC License](https://opensource.org/license/isc).
