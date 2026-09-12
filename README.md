@@ -2,6 +2,10 @@
 
 Your kitchen's smartest sous-chef. An AI-powered recipe web app with conversation, fridge vision, and voice-guided cooking.
 
+## GitHub
+
+**https://github.com/Nida0526/smartchef-ai**
+
 ## Live Demo
 
 **https://carrier-fitted-particle-jar.trycloudflare.com**
