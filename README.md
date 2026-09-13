@@ -15,6 +15,12 @@ An AI-powered recipe web app featuring a conversational recipe finder, fridge & 
 
 ---
 
+## 🔗 Live Demo
+
+**https://smartchef-ai-tawny.vercel.app**
+
+Try it now — log in with the demo credentials below.
+
 ## ✨ Features
 
 | Feature | Description |
