@@ -4,9 +4,10 @@
 
 **Your kitchen's smartest sous-chef.**
 
-An AI-powered recipe web application featuring conversational recipe finder, fridge & pantry vision, full recipe generation, and hands-free voice-guided cooking.
+An AI-powered recipe web app featuring a conversational recipe finder, fridge & pantry vision, full recipe generation, and hands-free voice-guided cooking.
 
-[![GitHub](https://img.shields.io/badge/GitHub-SmartChef%20AI-8f1c2e?style=flat-square&logo=github)](https://github.com/Nida0526/smartchef-ai)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-SmartChef%20AI-8f1c2e?style=flat-square)](https://smartchef-ai-tawny.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-smartchef--ai-8f1c2e?style=flat-square&logo=github)](https://github.com/Nida0526/smartchef-ai)
 [![License](https://img.shields.io/badge/license-ISC-blue?style=flat-square)](LICENSE)
 ![Tech](https://img.shields.io/badge/stack-React%2019%20%2B%20Express%205-8f1c2e?style=flat-square)
 
@@ -30,8 +31,9 @@ An AI-powered recipe web application featuring conversational recipe finder, fri
 ## 🧱 Tech Stack
 
 - **Frontend:** React 19, Vite 8, React Router 7, lucide-react — white & maroon kitchen-themed UI
-- **Backend:** Node.js, Express 5, Mongoose, MongoDB
+- **Backend:** Node.js, Express 5, Mongoose, MongoDB Atlas
 - **AI:** Google Gemini `gemini-3.6-flash` (primary), OpenAI (configurable fallback), built-in Demo Mode fallback so the UI never breaks
+- **Hosting:** Vercel (serverless function serving UI + API)
 
 ## 🚀 Getting Started
 
@@ -75,31 +77,31 @@ The production server serves the built frontend at `/` and the API under `/api` 
 
 ## 🔑 Demo Accounts
 
-Two accounts are **seeded automatically on every backend start** — so they always work, even though the default database is in-memory.
+Two accounts are **seeded automatically on every backend start** — so they always work. They're configured in [`backend/seedDemoUser.js`](backend/seedDemoUser.js).
 
 | Name | Email | Password |
 |---|---|---|
 | Demo Chef | `demo@smartchef.ai` | `smartchef123` |
 | Guest User | `guest@smartchef.ai` | `guest1234` |
 
-Configured in [`backend/seedDemoUser.js`](backend/seedDemoUser.js).
-
 ## 🗂️ Project Structure
 
 ```
 smartchef-ai/
-├── backend/                  # Express API
-│   ├── controllers/          # auth + AI logic (chat, vision, recipes, stream)
-│   ├── models/               # Mongoose models (User, SavedRecipe, ChatHistory, Preference)
-│   ├── routes/               # API route definitions
-│   ├── seedDemoUser.js       # seeds demo login accounts on boot
-│   └── server.js             # Express app (serves frontend dist in production)
-├── frontend/                 # React app
-│   ├── public/               # favicon + icons
+├── api/                     # Vercel serverless entry point
+├── backend/                 # Express API
+│   ├── controllers/         # auth + AI logic (chat, vision, recipes, stream)
+│   ├── models/              # Mongoose models (User, SavedRecipe, ChatHistory, Preference)
+│   ├── routes/              # API route definitions
+│   ├── seedDemoUser.js      # seeds demo login accounts on boot
+│   ├── app.js               # shared Express app (local server + Vercel function)
+│   └── server.js            # local server entry
+├── frontend/                # React app
+│   ├── public/              # favicon + icons
 │   └── src/
-│       ├── components/       # Navbar, CookMode, KitchenArt, AuthHero, …
-│       ├── pages/            # Dashboard, Generator, SavedRecipes, Login, Register
-│       └── lib/              # API client (axios + streaming)
+│       ├── components/      # Navbar, CookMode, KitchenArt, AuthHero, …
+│       ├── pages/           # Dashboard, Generator, SavedRecipes, Login, Register
+│       └── lib/             # API client (axios + streaming)
 ├── README.md
 └── DEMO_ACCOUNTS.md
 ```
@@ -132,13 +134,15 @@ smartchef-ai/
 
 ## 🚢 Deployment
 
-The default database is **in-memory** (`MongoMemoryServer`), so registered accounts and saved data reset on restart — the two demo accounts are always recreated.
+The live demo is deployed on **Vercel** with **MongoDB Atlas** for persistent storage.
 
-For a **permanent deployment**:
+To run your own instance:
 
-1. Create a free MongoDB Atlas cluster and set `MONGODB_URI` (recommended)
-2. Deploy `backend/` + built `frontend/dist` to any Node host (Render, Railway, Fly.io, Vercel)
-3. Set `NODE_ENV=production` and `PORT` for the platform
+1. Create a free MongoDB Atlas cluster and set `MONGODB_URI`
+2. Deploy `backend/` + built `frontend/dist` to any Node host (Vercel, Render, Railway, Fly.io)
+3. Set `NODE_ENV=production`, `PORT`, `JWT_SECRET`, and `GEMINI_API_KEY` on the platform
+
+During local development without `MONGODB_URI`, the app falls back to an in-memory database (`MongoMemoryServer`) — registered accounts and saved data reset on restart, but the two demo accounts are always re-created.
 
 ## 📄 License
 
